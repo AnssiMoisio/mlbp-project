@@ -11,7 +11,7 @@ y_train = dl.transformed_labels(y_train)
 y_test = dl.transformed_labels(y_test)
 use_tensorboard = True # raskas, käytä vain tarvittaessa
 
-opt = Adam(lr=1)
+opt = Adam(lr=1e-3)
 
 model = Sequential()
 model.add(normalization.BatchNormalization())
@@ -19,21 +19,20 @@ model.add(Dense(400,
                 activation='sigmoid', 
                 input_dim=264,
                 kernel_regularizer=l1_l2(1e-4, 1e-4)))
-model.add(Dropout(rate=0.4))
+model.add(Dropout(rate=0.5))
 model.add(Dense(300, 
                 activation='sigmoid'))
 model.add(Dropout(rate=0.2))
-model.add(Dense(200, 
-                activation='sigmoid'))
-model.add(Dense(150, 
-                activation='sigmoid'))
 model.add(Dense(100, 
-                activation='sigmoid'))
-model.add(Dense(60, activation='sigmoid'))
+                activation='sigmoid',
+                kernel_regularizer=l1_l2(1e-5, 1e-5)))
+model.add(Dropout(rate=0.2))
+model.add(Dense(70, activation='sigmoid'))
+model.add(Dropout(rate=0.2))
 model.add(Dense(10, activation='sigmoid'))
 
 model.compile(loss='categorical_crossentropy',
-              optimizer='adam',
+              optimizer=opt,
               metrics=['accuracy'])
 
 # toisella komentorivillä samassa hakemistossa: tensorboard --logdir ./Graph
@@ -44,7 +43,7 @@ tensorboardCB = keras.callbacks.TensorBoard(log_dir='./Graph',
 
 if use_tensorboard:
     model.fit(x_train, y_train,
-            epochs=1000,
+            epochs=500,
             batch_size=8192,
             validation_data=(x_test, y_test),
             callbacks=[tensorboardCB])

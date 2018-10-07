@@ -11,7 +11,7 @@ y_train = dl.transformed_labels(y_train)
 y_test = dl.transformed_labels(y_test)
 use_tensorboard = True # raskas, käytä vain tarvittaessa
 
-opt = Adam(lr=1e-3)
+opt = Adam(lr=1e-5)
 
 model = Sequential()
 model.add(normalization.BatchNormalization())

@@ -9,9 +9,9 @@ dl = Preprocessor(balance=True)
 x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.8)
 y_train = dl.transformed_labels(y_train)
 y_test = dl.transformed_labels(y_test)
-use_tensorboard = True # raskas, käytä vain tarvittaessa
+use_tensorboard = False # raskas, käytä vain tarvittaessa
 
-opt = Adam(lr=1e-5)
+opt = Adam(lr=1e-4)
 
 model = Sequential()
 model.add(normalization.BatchNormalization())
@@ -49,8 +49,8 @@ if use_tensorboard:
             callbacks=[tensorboardCB])
 else:
     model.fit(x_train, y_train,
-            epochs=500,
-            batch_size=8192)
+            epochs=5000,
+            batch_size=256)
 
 score = model.evaluate(x_test, y_test, batch_size=128)
 print("Score: ", score)

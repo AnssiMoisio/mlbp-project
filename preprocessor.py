@@ -4,8 +4,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 class Preprocessor:
 
-	def __init__(self, path='data/', balance=True, mutation_rate=0.003):
+	def __init__(self, path='data/', balance=True, mutation_rate=5e-2, scale=True):
 		self.balance 		 = balance
+		self.scale 			 = scale
 		self.mutation_rate 	 = mutation_rate
 		self.data_path 		 = path
 		self.raw_data_labels = pd.read_csv(self.data_path + 'train_labels.csv', header=None)
@@ -14,6 +15,12 @@ class Preprocessor:
 
 	def load_raw_data(self):
 		data = pd.read_csv(self.data_path + 'train_data.csv', header=None).values
+		if self.scale:
+			ptp = data.ptp(0)
+			for i in range(ptp.shape[0]):
+				if ptp[i] == 0:
+					ptp[i] = 0.5
+			data = (data - data.min(0)) / ptp
 		return data
 
 	def balance_raw_data(self, data, labels):
@@ -24,22 +31,25 @@ class Preprocessor:
 		for label in labels:
 			distribution[int(label)] += 1
 		distmax = distribution[max(distribution, key=distribution.get)]
+		amount = 0
+		for key in distribution:
+			amount += distmax - distribution[key]
 		count = 0
 		tmp = np.empty((0, 265))
 		for label in self.unique_labels:
 			auxiliary_rows = raw[raw[:, 0] == label]
-			for aux in range(distmax - distribution[label]):
+			for _ in range(distmax - distribution[label]):
 				to_add = auxiliary_rows[np.random.randint(auxiliary_rows.shape[0])]
-				assert to_add.shape == (265, )
+				for elem in range(to_add.shape[0] - 1):
+					rnd = np.random.uniform(1 - self.mutation_rate, 1 + self.mutation_rate)
+					to_add[elem + 1] *= rnd
 				count += 1
 				if count % 1000 == 0:
-					print("Processed count: ", count)
+					print("Processed count: ", count, "/", amount)
 				tmp = np.append(tmp, [to_add], axis=0)
 		raw = np.vstack((raw, tmp))
 		new_labels = raw[:, :1]
 		new_features = raw[:, 1:]
-		print("Label shape: ", new_labels.shape, ", feature shape: ", new_features.shape)
-		# self.raw_data_labels = new_labels
 		return new_features, new_labels
 
 	def label_filter(self, row, label: int):
@@ -62,8 +72,10 @@ class Preprocessor:
 		return labels
 
 	# normalises columns to [0.0, 1.0]
-	def normalise_data(self):
-		pass
+	def normalize_data(self, data):
+		transformed = data
+		print(type(data))
+		return transformed
 
 	# divides training data according to ratio for training purposes: (training_data, training_labels), (testing_data, testing_labels)
 	# shape: (ratio*4263, col), ((1 - ratio)*4363, col)

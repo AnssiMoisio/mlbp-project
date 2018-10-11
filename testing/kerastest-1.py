@@ -7,8 +7,8 @@ from keras.layers import Dense, Dropout, Activation, normalization
 from keras.optimizers import SGD
 from keras import losses
 
-labels = pd.read_csv("data/train_labels.csv", index_col=False)
-training_data = pd.read_csv("data/train_data.csv",index_col=False)
+labels = pd.read_csv("../data/train_labels.csv", index_col=False)
+training_data = pd.read_csv("../data/train_data.csv",index_col=False)
 
 # suffle the data because it's ordered
 matrix = np.column_stack((labels, training_data))

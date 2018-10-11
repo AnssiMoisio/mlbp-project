@@ -5,8 +5,9 @@ from keras.layers import Dense, Dropout, Activation, normalization
 from keras.optimizers import SGD, Adam
 from keras.regularizers import l1_l2
 
-dl = Preprocessor(balance=True)
-x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.8)
+dl = Preprocessor(balance=False)
+x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.5)
+x_train, y_train =  Preprocessor.balance_raw_data(dl, x_train, y_train)
 y_train = dl.transformed_labels(y_train)
 y_test = dl.transformed_labels(y_test)
 use_tensorboard = False # raskas, käytä vain tarvittaessa
@@ -50,7 +51,8 @@ if use_tensorboard:
 else:
     model.fit(x_train, y_train,
             epochs=5000,
-            batch_size=256)
+            batch_size=256,
+            validation_data=(x_test, y_test))
 
 score = model.evaluate(x_test, y_test, batch_size=128)
 print("Score: ", score)

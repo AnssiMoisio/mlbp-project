@@ -50,4 +50,4 @@ y_classes = prediction.argmax(axis=-1) # convert probabilities into labels
 plt.figure(2, figsize=(10, 8))
 plt.title("prediction label distribution")
 plt.hist(y_classes, range=(-0.5,9.5), bins=10, ec='black')
-
+plt.show()

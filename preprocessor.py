@@ -23,7 +23,7 @@ class Preprocessor:
 			data = (data - data.min(0)) / ptp
 		return data
 
-	def balance_raw_data(self, data, labels):
+	def balance_raw_data(self, data, labels, save_bal_data, bal_data_path):
 		distribution = {}
 		raw = np.hstack((labels, data))
 		for label in self.unique_labels:
@@ -48,6 +48,10 @@ class Preprocessor:
 					print("Processed count: ", count, "/", amount)
 				tmp = np.append(tmp, [to_add], axis=0)
 		raw = np.vstack((raw, tmp))
+		# optionally saves the data
+		# boolean save_bal_data and save path is given to class method 'divided_data()'
+		if save_bal_data:
+			pd.DataFrame(raw).to_csv(bal_data_path)
 		new_labels = raw[:, :1]
 		new_features = raw[:, 1:]
 		return new_features, new_labels
@@ -79,14 +83,30 @@ class Preprocessor:
 
 	# divides training data according to ratio for training purposes: (training_data, training_labels), (testing_data, testing_labels)
 	# shape: (ratio*4263, col), ((1 - ratio)*4363, col)
-	def divided_data(self, ratio=0.5):
+	# loads preprocessed data from file or preprocesses the data and optionally saves to file
+	def divided_data(self, ratio=0.5, bal_data_path=None, load_bal_data=True, save_bal_data=False):
+		# path to balanced data file is used for both loading and saving the file
+		if not bal_data_path:
+			# appends ratio in percentages to file name
+			bal_data_path = self.data_path + 'bal_data_ratio_' + str(int(100*ratio)) + '.csv'
+
 		raw = np.hstack((self.raw_data_labels, self.raw_data))
 		np.random.shuffle(raw)
 		num = int(ratio * raw.shape[0])
 		training_data = raw[:num, 1:]
 		training_labels = raw[:num, :1]
-		if self.balance:
-			training_data, training_labels = self.balance_raw_data(training_data, training_labels)
+
+		# balance the data
+		if (self.balance and not load_bal_data):
+			training_data, training_labels = self.balance_raw_data(training_data, training_labels, save_bal_data, bal_data_path)
+
+		# use old balanced data file
+		if (self.balance and load_bal_data):
+			raw = pd.read_csv(bal_data_path, header=None).values
+			# pandas puts headers as first column and row
+			training_labels = raw[1:, 1:2]
+			training_data = raw[1:, 2:]
+
 		testing_data = raw[num:, 1:]
 		testing_labels = raw[num:, :1]
 		return training_data, training_labels, testing_data, testing_labels

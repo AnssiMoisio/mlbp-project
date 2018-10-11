@@ -26,7 +26,7 @@ from clusteringlayer import ClusteringLayer
 from autoencoder import Autoencoder
 
 dl = Preprocessor(balance=True, path='../data/')
-x, y, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=False, save_bal_data=True)
+x, y, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=True, save_bal_data=False)
 
 y = y.reshape((len(y),))
 

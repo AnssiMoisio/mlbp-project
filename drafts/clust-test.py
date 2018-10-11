@@ -3,6 +3,8 @@ import sklearn
 import pandas as pd 
 from matplotlib import pyplot as plt
 import numpy as np
+import sys
+sys.path.append('../')
 from preprocessor import Preprocessor
 import metrics
 from sklearn.cluster import KMeans
@@ -10,24 +12,27 @@ from keras.datasets import mnist
 from sklearn.preprocessing import minmax_scale, StandardScaler
 
 
-dl = Preprocessor(balance=False)
+dl = Preprocessor(balance=False, path='../data/')
 x_train, y_train, x_test, y_test = dl.divided_data(ratio=1)
 
-x_train = np.delete(x_train, [0,1600], 0)
-y_train = np.delete(y_train, [0,1600], 0)
+# x_train = Preprocessor.get_rhythm_patterns(dl, x_train)
+# x_train = Preprocessor.get_chroma(dl, x_train)
+x_train = Preprocessor.get_mfcc(dl, x_train)
+
+# y_train = np.delete(y_train, [0,1600], 0)
 
 
 # sklearn.preprocessing.normalize(x_train)
-# minmax_scale(x_train)
-StandardScaler(x_train)
+minmax_scale(x_train)
+# StandardScaler(x_train)
 
 # 10 clusters
 n_clusters = 10
 
 # Runs in parallel 4 CPUs, 20 initializations
-# clf = KMeans(n_clusters=n_clusters, n_init=40, max_iter=3000)
+clf = KMeans(n_clusters=n_clusters, n_init=20, max_iter=3000)
 # clf = AffinityPropagation()
-clf = MeanShift()
+# clf = MeanShift()
 
 if __name__ == '__main__':
     # Train K-Means.

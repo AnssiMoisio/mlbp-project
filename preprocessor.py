@@ -91,17 +91,17 @@ class Preprocessor:
 		testing_labels = raw[num:, :1]
 		return training_data, training_labels, testing_data, testing_labels
 
-	# returns columns (2-169)
+	# returns columns (1-168)
 	# shape: (row, 168)
 	def get_rhythm_patterns(self, data):
-		pass
+		return data[:,0:168]
 
-	# return columns (170-217)
+	# return columns (169-216)
 	# shape: (row, 48)
-	def get_chroma(self):
-		pass
+	def get_chroma(self, data):
+		return data[:,168:216]
 
-	# return columns 218-264
+	# return columns 217-264
 	# shape: (row, 48)
-	def get_mfcc(self):
-		pass
+	def get_mfcc(self, data):
+		return data[:,216:]

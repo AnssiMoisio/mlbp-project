@@ -7,7 +7,7 @@ from keras.regularizers import l1_l2
 
 dl = Preprocessor(balance=False)
 x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.5)
-x_train, y_train =  Preprocessor.balance_raw_data(dl, x_train, y_train)
+x_train, y_train =  dl.balance_raw_data(dl, x_train, y_train)
 y_train = dl.transformed_labels(y_train)
 y_test = dl.transformed_labels(y_test)
 use_tensorboard = False # raskas, käytä vain tarvittaessa

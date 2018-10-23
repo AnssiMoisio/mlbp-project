@@ -55,7 +55,7 @@ adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
 sgd = SGD(momentum=0.1, nesterov=True)
 
 model = Model(inputs=[rhythm_input, chroma_input, mfcc_input], outputs=classifier)
-model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adagrad', loss='categorical_crossentropy', metrics=['accuracy'])
 
 model.fit(input_data, y_train, 
 				validation_data=(validation_data, y_test), 

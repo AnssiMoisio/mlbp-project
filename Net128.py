@@ -5,6 +5,7 @@ from keras.models import Model
 from keras.optimizers import Adam, SGD
 from keras.regularizers import l1_l2
 import numpy as np
+from matplotlib import pyplot as plt
 
 dl = Preprocessor(balance=False, scale=True, mutation_rate=0.15)
 x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.8, load_bal_data=False)
@@ -60,3 +61,22 @@ model.fit(input_data, y_train,
 				validation_data=(validation_data, y_test), 
 				batch_size=256, 
 				epochs=300)
+
+
+
+data = dl.test_data
+test_data = [
+	data[:, :168],
+	data[:, 168:216],
+	data[:, 216:]
+]
+prediction = model.predict(test_data)
+y_classes = prediction.argmax(axis=-1) # convert probabilities into labels
+
+plt.figure(2, figsize=(10, 8))
+plt.title("prediction label distribution")
+plt.hist(y_classes, range=(-0.5,9.5), bins=10, ec='black')
+plt.show()
+
+y_classes = np.subtract(y_classes, [-1]*6544)
+dl.save_result(y_classes)

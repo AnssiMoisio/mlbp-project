@@ -11,10 +11,11 @@ class Preprocessor:
 		self.data_path 		 = path
 		self.raw_data_labels = pd.read_csv(self.data_path + 'train_labels.csv', header=None)
 		self.unique_labels	 = np.unique(self.raw_data_labels)
-		self.raw_data 		 = self.load_raw_data()
+		self.raw_data 		 = self.load_raw_data('train_data.csv')
+		self.test_data		 = self.load_raw_data('test_data.csv')
 
-	def load_raw_data(self):
-		data = pd.read_csv(self.data_path + 'train_data.csv', header=None).values
+	def load_raw_data(self, file):
+		data = pd.read_csv(self.data_path + file, header=None).values
 		if self.scale:
 			ptp = data.ptp(0)
 			for i in range(ptp.shape[0]):
@@ -125,3 +126,6 @@ class Preprocessor:
 	# shape: (row, 48)
 	def get_mfcc(self, data):
 		return data[:,216:]
+
+	def save_result(self, prediction):
+		pd.DataFrame(prediction).to_csv(self.data_path + 'result.csv')

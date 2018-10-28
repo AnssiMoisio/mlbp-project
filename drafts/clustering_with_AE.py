@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans, AffinityPropagation, MeanShift
+from sklearn.preprocessing import minmax_scale, StandardScaler
 import sklearn
 import pandas as pd 
 from matplotlib import pyplot as plt
@@ -6,27 +7,22 @@ import numpy as np
 import sys
 sys.path.append('../')
 from preprocessor import Preprocessor
-from sklearn.cluster import KMeans
-from keras.datasets import mnist
-from sklearn.preprocessing import minmax_scale, StandardScaler
 import keras
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, normalization, Input
 from keras.optimizers import SGD
+from keras.initializers import VarianceScaling
 from keras import losses
 from time import time
 import keras.backend as K
 from keras.engine.topology import Layer, InputSpec
-from keras.models import Model
 from keras import callbacks
-from keras.initializers import VarianceScaling
-from sklearn.cluster import KMeans
 import metrics
 from clusteringlayer import ClusteringLayer
 from autoencoder import Autoencoder
 
-dl = Preprocessor(balance=True, path='../data/')
-x, y, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=True, save_bal_data=False)
+dl = Preprocessor(balance=False, scale=False, path='../data/')
+x, y, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=False, save_bal_data=False)
 
 y = y.reshape((len(y),))
 
@@ -54,8 +50,8 @@ print("accuracy with kmeans: ", metrics.acc(y, y_pred))
 dims = [x.shape[-1], 200, 200, 2000, 10] # dims for the encoder layers, decoder is symmetric
 init = VarianceScaling(scale=1. / 3., mode='fan_in', distribution='uniform')
 pretrain_optimizer = SGD(lr=1, momentum=0.9)
-pretrain_epochs = 300
-batch_size = 256
+pretrain_epochs = 100
+batch_size = 200
 save_dir = './results'
 
 autoencoder, encoder = Autoencoder(dims, init=init)
@@ -64,22 +60,22 @@ autoencoder, encoder = Autoencoder(dims, init=init)
 # Train autoencoder
 autoencoder.compile(optimizer=pretrain_optimizer, loss='mse')
 autoencoder.fit(x, x, batch_size=batch_size, epochs=pretrain_epochs) #, callbacks=cb)
-autoencoder.save_weights(save_dir + '/ae_weights-200-200-2000-10-balanced.h5')
+autoencoder.save_weights(save_dir + '/ae_weights-200-200-2000-10-notbal-notscale.h5')
 '''
 
 # load pre-trained autoencoder
-autoencoder.load_weights(save_dir + '/ae_weights-200-200-2000-10-balanced.h5')
+autoencoder.load_weights(save_dir + '/ae_weights-200-200-2000-10-notbal.h5')
 
 if __name__ == '__main__':
     y_pred = kmeans.fit_predict(encoder.predict(x))
 
-'''
+
 # plot histogram of prediction
 plt.figure(1, figsize=(10, 8))
 plt.title("prediction label distribution")
 plt.hist(y_pred, range=(-0.5,9.5), bins=10, ec='black')
 plt.show()
-'''
+
 
 # Evaluate the K-Means clustering accuracy.
 print("accuracy with encoder + kmeans: ", metrics.acc(y, y_pred))

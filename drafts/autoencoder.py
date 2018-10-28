@@ -9,7 +9,6 @@ from keras import callbacks
 from keras.initializers import VarianceScaling
 from sklearn.cluster import KMeans
 import metrics
-from keras.engine.topology import Layer, InputSpec
 
 
 def Autoencoder(dims, act='relu', init='glorot_uniform'):

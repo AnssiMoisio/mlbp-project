@@ -7,6 +7,7 @@ import numpy as np
 import sys
 sys.path.append('../')
 from preprocessor import Preprocessor
+from PCA import PCA
 import keras
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, normalization, Input
@@ -39,6 +40,10 @@ n_clusters = 10
 # clf = AffinityPropagation()
 # clf = MeanShift()
 
+# sklearn.preprocessing.normalize(x)
+pca = PCA(x, 10)
+x = pca.low_dim_data()
+
 # try basic clustering first for the data
 kmeans = KMeans(n_clusters=n_clusters, n_init=20)
 if __name__ == '__main__':
@@ -46,25 +51,26 @@ if __name__ == '__main__':
 
 print("accuracy with kmeans: ", metrics.acc(y, y_pred))
 
+'''
 # parameters for autoencoder
 dims = [x.shape[-1], 200, 200, 2000, 10] # dims for the encoder layers, decoder is symmetric
 init = VarianceScaling(scale=1. / 3., mode='fan_in', distribution='uniform')
 pretrain_optimizer = SGD(lr=1, momentum=0.9)
-pretrain_epochs = 100
-batch_size = 200
+pretrain_epochs = 20
+batch_size = 320
 save_dir = './results'
 
 autoencoder, encoder = Autoencoder(dims, init=init)
 
-'''
+
 # Train autoencoder
 autoencoder.compile(optimizer=pretrain_optimizer, loss='mse')
 autoencoder.fit(x, x, batch_size=batch_size, epochs=pretrain_epochs) #, callbacks=cb)
-autoencoder.save_weights(save_dir + '/ae_weights-200-200-2000-10-notbal-notscale.h5')
-'''
+autoencoder.save_weights(save_dir + '/ae_weights-200-200-2000-10-sunday.h5')
+
 
 # load pre-trained autoencoder
-autoencoder.load_weights(save_dir + '/ae_weights-200-200-2000-10-notbal.h5')
+autoencoder.load_weights(save_dir + '/ae_weights-200-200-2000-10-sunday.h5')
 
 if __name__ == '__main__':
     y_pred = kmeans.fit_predict(encoder.predict(x))
@@ -100,7 +106,7 @@ index_array = np.arange(x.shape[0])
 
 tol = 0.000000001 # tolerance threshold to stop training
 
-'''
+
 # train the model
 for ite in range(int(maxiter)):
     if ite % update_interval == 0:
@@ -128,11 +134,11 @@ for ite in range(int(maxiter)):
     model.train_on_batch(x=x[idx], y=p[idx])
     index = index + 1 if (index + 1) * batch_size <= x.shape[0] else 0
 
-model.save_weights(save_dir + '/DEC_model_final.h5')
-'''
+model.save_weights(save_dir + '/DEC_model_final-1.h5')
+
 
 # use pre-trained model
-model.load_weights(save_dir + '/DEC_model_final.h5')
+model.load_weights(save_dir + '/DEC_model_final-1.h5')
 
 # Eval.
 q = model.predict(x, verbose=0)
@@ -147,3 +153,15 @@ if y is not None:
     loss = np.round(loss, 5)
     print('Acc = %.5f, nmi = %.5f, ari = %.5f' % (acc, nmi, ari), ' ; loss=', loss)
 
+data = dl.test_data
+prediction = model.predict(data)
+y_classes = prediction.argmax(axis=-1) # convert probabilities into labels
+
+plt.figure(2, figsize=(10, 8))
+plt.title("prediction label distribution")
+plt.hist(y_classes, range=(-0.5,9.5), bins=10, ec='black')
+plt.show()
+
+y_classes = np.subtract(y_classes, [-1]*6544)
+pd.DataFrame(y_classes).to_csv('result-1.csv')
+'''

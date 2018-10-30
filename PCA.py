@@ -47,8 +47,6 @@ class PCA:
             
         plt.scatter(X_2d[:,0], X_2d[:,1], 3)
 
-        # plt.xlim(-1., -0.9995)
-        # plt.ylim(-0.02, 0.06)
         plt.xlabel('First principal component')
         plt.ylabel('Second principal component')
         plt.show()
@@ -62,7 +60,7 @@ class PCA:
         
 
 def main():
-    dl = Preprocessor(balance=False, scale=True)
+    dl = Preprocessor(balance=False, scale=False)
     x_train, y_train, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=False)
     pca = PCA(x_train, 50)
 

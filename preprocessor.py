@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, normalize
+from sklearn import preprocessing
 
 class Preprocessor:
 
@@ -17,11 +18,7 @@ class Preprocessor:
 	def load_raw_data(self, file):
 		data = pd.read_csv(self.data_path + file, header=None).values
 		if self.scale:
-			ptp = data.ptp(0)
-			for i in range(ptp.shape[0]):
-				if ptp[i] == 0:
-					ptp[i] = 0.5
-			data = (data - data.min(0)) / ptp
+			data = preprocessing.scale(data)
 		return data
 
 	def balance_raw_data(self, data, labels, save_bal_data, bal_data_path):
@@ -126,6 +123,3 @@ class Preprocessor:
 	# shape: (row, 48)
 	def get_mfcc(self, data):
 		return data[:,216:]
-
-	def save_result(self, prediction):
-		pd.DataFrame(prediction).to_csv(self.data_path + 'result.csv')

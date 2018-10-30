@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import sklearn.preprocessing
-
+from preprocessor import Preprocessor
 from sklearn.linear_model import LogisticRegression
 
 class PCA:
@@ -44,11 +44,15 @@ class PCA:
         # get x for d=2
         X_2d = np.matmul(self.W_pca[:2,:],self.data[:,:,None])[:,:,0]
         plt.figure(1, figsize=(10, 10))
-        plt.scatter(X_2d[:,0],X_2d[:,1], 3)
-        plt.legend()
+            
+        plt.scatter(X_2d[:,0], X_2d[:,1], 3)
+
+        # plt.xlim(-1., -0.9995)
+        # plt.ylim(-0.02, 0.06)
         plt.xlabel('First principal component')
         plt.ylabel('Second principal component')
         plt.show()
+
     
     def low_dim_data(self):
         new_data = np.ndarray((self.data.shape[0], self.d))
@@ -57,16 +61,16 @@ class PCA:
         return new_data
         
 
-# def main():
-#     data = pd.read_csv('/data/train_data.csv')
-#     data = sklearn.preprocessing.normalize(data)
-#     pca = PCA(data, 50)
+def main():
+    dl = Preprocessor(balance=False, scale=True)
+    x_train, y_train, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=False)
+    pca = PCA(x_train, 50)
 
-#     print(pca.low_dim_data().shape)
+    print(pca.low_dim_data().shape)
   
-#     # plot the number of principal components vs the reconstruction error
-#     pca.plot_error(30)
+    # plot the number of principal components vs the reconstruction error
+    pca.plot_error(30)
 
-#     pca.plot_scatter()
+    pca.plot_scatter()
 
-# main()
+main()

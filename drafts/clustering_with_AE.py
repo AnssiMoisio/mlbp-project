@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append('../')
 from preprocessor import Preprocessor
-from PCA import PCA
+# from PCA import PCA
 import keras
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, normalization, Input
@@ -21,6 +21,7 @@ from keras import callbacks
 import metrics
 from clusteringlayer import ClusteringLayer
 from autoencoder import Autoencoder
+from sklearn import preprocessing
 
 dl = Preprocessor(balance=False, scale=False, path='../data/')
 x, y, x_test, y_test = dl.divided_data(ratio=1, load_bal_data=False, save_bal_data=False)
@@ -41,8 +42,10 @@ n_clusters = 10
 # clf = MeanShift()
 
 # sklearn.preprocessing.normalize(x)
-pca = PCA(x, 10)
-x = pca.low_dim_data()
+# pca = PCA(x, 10)
+# x = pca.low_dim_data()
+
+x = preprocessing.scale(x)
 
 # try basic clustering first for the data
 kmeans = KMeans(n_clusters=n_clusters, n_init=20)

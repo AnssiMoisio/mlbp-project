@@ -17,22 +17,22 @@ rhythm_input = Input(shape=(168,)) # timesteps, timestep dimension
 chroma_input = Input(shape=(48,)) # timesteps, timestep dimension
 mfcc_input 	 = Input(shape=(48,)) # timesteps, timestep dimension
 
-rhythm_lstm  = Dense(168, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(rhythm_input)
-rhythm_lstm  = Dropout(rate=0.3)(rhythm_lstm)
-rhythm_lstm  = Dense(42, activation='softmax', kernel_regularizer=l1_l2(1e-6, 2e-6))(rhythm_lstm)
-rhythm_lstm  = Dropout(rate=0.4)(rhythm_lstm)
+rhythm  = Dense(168, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(rhythm_input)
+rhythm  = Dropout(rate=0.3)(rhythm)
+rhythm  = Dense(42, activation='softmax', kernel_regularizer=l1_l2(1e-6, 2e-6))(rhythm)
+rhythm  = Dropout(rate=0.4)(rhythm)
 
-chroma_lstm  = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(chroma_input)
-chroma_lstm  = Dropout(rate=0.3)(chroma_lstm)
-chroma_lstm  = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(chroma_lstm)
-chroma_lstm  = Dropout(rate=0.4)(chroma_lstm)
+chroma  = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(chroma_input)
+chroma  = Dropout(rate=0.3)(chroma)
+chroma  = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(chroma)
+chroma  = Dropout(rate=0.4)(chroma)
 
-mfcc_lstm  	 = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(mfcc_input)
-mfcc_lstm    = Dropout(rate=0.3)(mfcc_lstm)
-mfcc_lstm  	 = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(mfcc_lstm)
-mfcc_lstm    = Dropout(rate=0.4)(mfcc_lstm)
+mfcc  	 = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(mfcc_input)
+mfcc    = Dropout(rate=0.3)(mfcc)
+mfcc  	 = Dense(48, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(mfcc)
+mfcc    = Dropout(rate=0.4)(mfcc)
 
-classifier 	 = concatenate([rhythm_lstm, chroma_lstm, mfcc_lstm], axis=-1)
+classifier 	 = concatenate([rhythm, chroma, mfcc], axis=-1)
 
 for rate in range(3):
 	classifier = Dense(120, activation='tanh', kernel_regularizer=l1_l2(1e-6, 1e-6))(classifier)

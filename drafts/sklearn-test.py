@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.svm import LinearSVC
 from sklearn.multiclass import OutputCodeClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, log_loss
 from sklearn import linear_model
 import sys
 sys.path.append('../')
@@ -41,7 +41,7 @@ x_train, y_train, x_test, y_test = dl.divided_data(ratio=0.8, load_bal_data=Fals
 # X2 = training_data[3000:,]
 # y2 = y[3000:]
 
-clf = LogisticRegression(random_state=0, solver='saga',multi_class='multinomial', max_iter=1000, verbose=1)
+clf = LogisticRegression(random_state=0, solver='saga',multi_class='multinomial', max_iter=600, verbose=1)
 # clf = OneVsOneClassifier(LinearSVC(random_state=0, max_iter=1000, verbose=1)) 
 # clf = OutputCodeClassifier(LinearSVC(random_state=0, max_iter=1000, verbose=1), code_size=2, random_state=0)
 # clf = linear_model.SGDClassifier(max_iter=300, loss='log', verbose=1)
@@ -53,7 +53,10 @@ prediction = model.predict(x_test)
 print("train score: ", clf.score(x_train, y_train))
 print("test score: ", clf.score(x_test, y_test))
 
-
+# print logloss
+clf_probs = clf.predict_proba(x_test)
+score = log_loss(y_test, clf_probs)
+print("test log-loss: ", score)
 
 
 '''
